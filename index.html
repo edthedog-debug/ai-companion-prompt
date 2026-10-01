@@ -201,7 +201,7 @@
 
         <div class="chat-panel">
             <div class="chat-messages" id="chatMessages">
-                <div class="message ai">Sistema inicializado. Escribe tu clave de API de Gemini y comienza la sesión.</div>
+                <div class="message ai">Sistema inicializado. Núcleo neural conectado. Escribe tu mensaje.</div>
             </div>
             <div class="chat-input-area">
                 <input type="text" id="userInput" placeholder="Introducir comando o mensaje..." autocomplete="off">
@@ -219,7 +219,9 @@
 
         let frameCount = 0;
         let isAnimating = false;
-        let apiKey = localStorage.getItem('GEMINI_API_KEY') || '';
+
+        // Se inyectará automáticamente desde GitHub Actions, o recurrirá a localStorage/prompt si se prueba en local
+        let apiKey = window.env_GEMINI_API_KEY || localStorage.getItem('GEMINI_API_KEY') || '';
 
         const reaperSprite = [
             [0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
@@ -309,7 +311,6 @@
             
             const aiResponse = await callGeminiAPI(text);
             
-            // Remove processing indicator and append real response
             chatMessages.lastChild.remove();
             appendMessage(aiResponse, 'ai');
             
