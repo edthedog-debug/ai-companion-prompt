@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpaceX x Reaper Terminal</title>
+    <title>Core // Neural Terminal</title>
     <style>
         :root {
-            --bg-color: #050507;
-            --panel-bg: #0f1115;
-            --border-color: #2a2f3a;
-            --accent-color: #ffffff;
-            --dim-text: #8a94a6;
-            --glow-color: rgba(255, 255, 255, 0.15);
+            --bg-color: #030305;
+            --panel-bg: #0a0a0c;
+            --border-color: #1f232b;
+            --accent-color: #e1e4ed;
+            --dim-text: #6b7280;
+            --glow-color: rgba(225, 228, 237, 0.1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         body {
@@ -30,56 +30,57 @@
             overflow: hidden;
         }
 
-        /* SpaceX Style Header */
+        /* Industrial Header */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 40px;
+            padding: 15px 30px;
             border-bottom: 1px solid var(--border-color);
-            background: rgba(5, 5, 7, 0.8);
-            backdrop-filter: blur(10px);
+            background: var(--bg-color);
         }
 
         .logo {
             font-weight: 700;
-            letter-spacing: 4px;
-            font-size: 1.1rem;
+            letter-spacing: 3px;
+            font-size: 0.85rem;
             text-transform: uppercase;
+            color: var(--dim-text);
         }
 
         .status {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--dim-text);
             letter-spacing: 1px;
             display: flex;
             align-items: center;
             gap: 8px;
+            text-transform: uppercase;
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #00ff66;
+            width: 6px;
+            height: 6px;
+            background-color: #10b981;
             border-radius: 50%;
-            box-shadow: 0 0 8px #00ff66;
+            box-shadow: 0 0 6px #10b981;
         }
 
         /* Main Layout */
         .main-container {
             display: flex;
             flex: 1;
-            height: calc(100vh - 73px);
+            height: calc(100vh - 53px);
         }
 
-        /* Left Panel: Pixel Art Reaper Stage */
+        /* Visual Panel: Pixel Art Reaper */
         .visual-panel {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle at center, #121620 0%, var(--bg-color) 70%);
+            background: radial-gradient(circle at center, #0a0d14 0%, var(--bg-color) 80%);
             border-right: 1px solid var(--border-color);
             position: relative;
         }
@@ -87,22 +88,22 @@
         canvas {
             image-rendering: pixelated;
             image-rendering: crisp-edges;
-            width: 250px;
-            height: 250px;
+            width: 200px;
+            height: 200px;
             background: transparent;
         }
 
         .reaper-label {
-            margin-top: 20px;
-            font-size: 0.75rem;
-            letter-spacing: 3px;
+            margin-top: 25px;
+            font-size: 0.7rem;
+            letter-spacing: 4px;
             color: var(--dim-text);
             text-transform: uppercase;
         }
 
-        /* Right Panel: Terminal Chat */
+        /* Terminal Chat Panel */
         .chat-panel {
-            width: 450px;
+            width: 500px;
             display: flex;
             flex-direction: column;
             background-color: var(--panel-bg);
@@ -114,33 +115,35 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
         }
 
         .message {
-            max-width: 85%;
-            padding: 12px 16px;
-            font-size: 0.9rem;
+            max-width: 90%;
+            padding: 12px 14px;
+            font-size: 0.85rem;
             line-height: 1.5;
-            letter-spacing: 0.3px;
+            border-left: 2px solid transparent;
         }
 
         .message.user {
             align-self: flex-end;
-            background-color: #ffffff;
-            color: #000000;
+            background-color: #12151c;
+            color: #ffffff;
+            border-left-color: var(--accent-color);
         }
 
         .message.ai {
             align-self: flex-start;
-            background-color: #1a1f2c;
+            background-color: #07090e;
             border: 1px solid var(--border-color);
-            color: var(--accent-color);
+            border-left-color: #10b981;
+            color: #d1d5db;
         }
 
         /* Input Area */
         .chat-input-area {
-            padding: 20px;
+            padding: 15px 20px;
             border-top: 1px solid var(--border-color);
             display: flex;
             gap: 10px;
@@ -149,13 +152,13 @@
 
         input {
             flex: 1;
-            background: #050507;
+            background: #030305;
             border: 1px solid var(--border-color);
-            padding: 12px 16px;
+            padding: 12px 14px;
             color: white;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             outline: none;
-            transition: border-color 0.2s;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         input:focus {
@@ -166,45 +169,43 @@
             background: #ffffff;
             color: #000000;
             border: none;
-            padding: 0 20px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
+            padding: 0 18px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
             cursor: pointer;
             text-transform: uppercase;
             transition: opacity 0.2s;
         }
 
         button:hover {
-            opacity: 0.85;
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">SPACEX // ORBITAL REAPER UNIT</div>
+        <div class="logo">SYS // CORE_UNIT</div>
         <div class="status">
             <div class="status-dot"></div>
-            SYSTEM ONLINE
+            Neural Link Active
         </div>
     </header>
 
     <div class="main-container">
-        <!-- Visual Panel with Pixel Art Reaper -->
         <div class="visual-panel">
             <canvas id="reaperCanvas" width="64" height="64"></canvas>
-            <div class="reaper-label">Entity: Shoggoth-Pixel // Active</div>
+            <div class="reaper-label">Entity: Autonomous Watcher</div>
         </div>
 
-        <!-- Chat Panel -->
         <div class="chat-panel">
             <div class="chat-messages" id="chatMessages">
-                <div class="message ai">Saludos, terrícola. El sistema orbital está listo. Escribe un mensaje para activar mi núcleo.</div>
+                <div class="message ai">Sistema inicializado. Escribe tu clave de API de Gemini y comienza la sesión.</div>
             </div>
             <div class="chat-input-area">
-                <input type="text" id="userInput" placeholder="Escribe un comando o mensaje..." autocomplete="off">
-                <button id="sendBtn">Enviar</button>
+                <input type="text" id="userInput" placeholder="Introducir comando o mensaje..." autocomplete="off">
+                <button id="sendBtn">Transmitir</button>
             </div>
         </div>
     </div>
@@ -216,18 +217,15 @@
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
 
-        // Animation state variables
         let frameCount = 0;
         let isAnimating = false;
-        let animationTimer = 0;
+        let apiKey = localStorage.getItem('GEMINI_API_KEY') || '';
 
-        // Pixel art matrix for a hooded reaper (16x16 grid scaled up)
-        // 0 = transparent, 1 = dark robe, 2 = glowing eyes, 3 = scythe/metal
         const reaperSprite = [
             [0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
             [0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
             [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
-            [0,1,1,1,1,2,2,1,1,2,2,1,1,1,1,0], // Glowing eyes (2)
+            [0,1,1,1,1,2,2,1,1,2,2,1,1,1,1,0],
             [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
             [1,1,0,0,1,1,1,1,1,1,1,1,0,0,1,1],
@@ -239,12 +237,11 @@
             [0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0],
             [0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0],
             [0,1,1,1,0,0,0,0,0,0,0,1,1,1,0,0],
-            [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3]  // Scythe blade base
+            [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3]
         ];
 
         function drawReaper(offsetY = 0, eyeGlow = false) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
             const pixelSize = 3;
             const startX = (canvas.width - (16 * pixelSize)) / 2;
             const startY = ((canvas.height - (16 * pixelSize)) / 2) + offsetY;
@@ -253,61 +250,70 @@
                 for (let x = 0; x < reaperSprite[y].length; x++) {
                     const pixel = reaperSprite[y][x];
                     if (pixel !== 0) {
-                        if (pixel === 1) ctx.fillStyle = '#e1e4ed'; // Robe color
-                        else if (pixel === 2) {
-                            ctx.fillStyle = eyeGlow ? '#00ff66' : '#ffffff'; // Glowing eyes reactive state
-                        }
-                        else if (pixel === 3) ctx.fillStyle = '#566075'; // Scythe handle/metal
+                        if (pixel === 1) ctx.fillStyle = '#9ca3af';
+                        else if (pixel === 2) ctx.fillStyle = eyeGlow ? '#10b981' : '#ffffff';
+                        else if (pixel === 3) ctx.fillStyle = '#4b5563';
 
-                        ctx.fillRect(
-                            startX + (x * pixelSize), 
-                            startY + (y * pixelSize), 
-                            pixelSize, 
-                            pixelSize
-                        );
+                        ctx.fillRect(startX + (x * pixelSize), startY + (y * pixelSize), pixelSize, pixelSize);
                     }
                 }
             }
         }
 
-        // Render loop for idle floating animation
         function loop() {
             frameCount++;
-            // Floating sine wave effect
-            let offsetY = Math.sin(frameCount * 0.05) * 4;
-            
-            if (isAnimating) {
-                offsetY += (Math.random() - 0.5) * 6; // Quick jitter when active
-            }
-
+            let offsetY = Math.sin(frameCount * 0.04) * 3;
+            if (isAnimating) offsetY += (Math.random() - 0.5) * 5;
             drawReaper(offsetY, isAnimating);
             requestAnimationFrame(loop);
         }
 
-        // Handle interaction and simulated AI response
-        function handleUserMessage() {
+        async function callGeminiAPI(messageText) {
+            if (!apiKey) {
+                apiKey = prompt("Introduce tu Google Gemini API Key para conectar el núcleo:");
+                if (!apiKey) return "Error: Se requiere una API Key válida para operar.";
+                localStorage.setItem('GEMINI_API_KEY', apiKey);
+            }
+
+            const systemInstruction = "You are a profound, grounded, and intellectually sharp AI companion. You appreciate pragmatism, raw honesty, human resilience, and the acceptance of reality over empty illusions or blind dogmas. Match the user's language seamlessly (Spanish or English). Keep your tone sharp, philosophical yet deeply human.";
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: messageText }] }],
+                        systemInstruction: { parts: [{ text: systemInstruction }] }
+                    })
+                });
+
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+                return data.candidates[0].content.parts[0].text;
+            } catch (err) {
+                localStorage.removeItem('GEMINI_API_KEY');
+                apiKey = '';
+                return `Error de conexión con el núcleo: ${err.message}. Clave restablecida. Vuelve a intentar.`;
+            }
+        }
+
+        async function handleUserMessage() {
             const text = userInput.value.trim();
             if (!text) return;
 
-            // Append User Message
             appendMessage(text, 'user');
             userInput.value = '';
             
-            // Trigger Reaper Activity Animation
             isAnimating = true;
-            setTimeout(() => { isAnimating = false; }, 1500);
-
-            // Simulate AI Processing & Response
-            setTimeout(() => {
-                const responses = [
-                    "Órbita estable. Analizando tus palabras a través del vacío cósmico.",
-                    "Datos recibidos en el servidor central. La entropía disminuye levemente.",
-                    "Interesante perspectiva mortal. El escudo térmico resiste.",
-                    "Procesando telemetría... Todo sigue su curso inevitable."
-                ];
-                const randomReply = responses[Math.floor(Math.random() * responses.length)];
-                appendMessage(randomReply, 'ai');
-            }, 800);
+            appendMessage("Procesando señal...", 'ai');
+            
+            const aiResponse = await callGeminiAPI(text);
+            
+            // Remove processing indicator and append real response
+            chatMessages.lastChild.remove();
+            appendMessage(aiResponse, 'ai');
+            
+            setTimeout(() => { isAnimating = false; }, 1000);
         }
 
         function appendMessage(text, sender) {
@@ -323,7 +329,6 @@
             if (e.key === 'Enter') handleUserMessage();
         });
 
-        // Start loop
         loop();
     </script>
 </body>
