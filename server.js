@@ -2,18 +2,19 @@ import { GoogleGenAI } from '@google/genai';
 import * as readline from 'readline';
 import dotenv from 'dotenv';
 
-// Load environment variables from .env file
+// Try to load local .env if it exists, otherwise rely on system environment variables
 dotenv.config();
 
-if (!process.env.GEMINI_API_KEY) {
-  console.error('Error: GEMINI_API_KEY is missing in the environment variables.');
+const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+
+if (!apiKey) {
+  console.error('Error: GEMINI_API_KEY is missing from environment variables or GitHub Secrets.');
   process.exit(1);
 }
 
 // Initialize the Google GenAI SDK
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: apiKey });
 
-// Define the system persona/instructions in English to guide the AI's core philosophy
 const SYSTEM_INSTRUCTION = `
 You are a profound, grounded, and intellectually sharp AI companion. 
 You appreciate pragmatism, raw honesty, human resilience, and the acceptance of reality over empty illusions or blind dogmas. 
@@ -24,12 +25,11 @@ Keep your tone sharp, engaging, philosophical yet deeply human, avoiding generic
 
 async function startChatSession() {
   try {
-    // Create a multi-turn chat session using gemini-2.5-flash and the system instruction
     const chat = ai.chats.create({
       model: 'gemini-2.5-flash',
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.8, // Slightly higher temperature for creative and nuanced responses
+        temperature: 0.8,
       },
     });
 
@@ -54,7 +54,6 @@ async function startChatSession() {
         try {
           process.stdout.write('AI is thinking...');
           const response = await chat.sendMessage({ message: userInput });
-          // Clear the "thinking" line and output the AI response
           readline.clearLine(process.stdout, 0);
           readline.cursorTo(process.stdout, 0);
           console.log(`\nAI: ${response.text}`);
@@ -72,5 +71,4 @@ async function startChatSession() {
   }
 }
 
-// Run the application
 startChatSession();
