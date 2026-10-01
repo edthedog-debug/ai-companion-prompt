@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpaceX x Reaper Terminal</title>
+    <style>
+        :root {
+            --bg-color: #050507;
+            --panel-bg: #0f1115;
+            --border-color: #2a2f3a;
+            --accent-color: #ffffff;
+            --dim-text: #8a94a6;
+            --glow-color: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--accent-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* SpaceX Style Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(5, 5, 7, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-weight: 700;
+            letter-spacing: 4px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: var(--dim-text);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #00ff66;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00ff66;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 73px);
+        }
+
+        /* Left Panel: Pixel Art Reaper Stage */
+        .visual-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #121620 0%, var(--bg-color) 70%);
+            border-right: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        canvas {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            width: 250px;
+            height: 250px;
+            background: transparent;
+        }
+
+        .reaper-label {
+            margin-top: 20px;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            color: var(--dim-text);
+            text-transform: uppercase;
+        }
+
+        /* Right Panel: Terminal Chat */
+        .chat-panel {
+            width: 450px;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--panel-bg);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            letter-spacing: 0.3px;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            background-color: #1a1f2c;
+            border: 1px solid var(--border-color);
+            color: var(--accent-color);
+        }
+
+        /* Input Area */
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            background: var(--panel-bg);
+        }
+
+        input {
+            flex: 1;
+            background: #050507;
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--accent-color);
+        }
+
+        button {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 0 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">SPACEX // ORBITAL REAPER UNIT</div>
+        <div class="status">
+            <div class="status-dot"></div>
+            SYSTEM ONLINE
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Visual Panel with Pixel Art Reaper -->
+        <div class="visual-panel">
+            <canvas id="reaperCanvas" width="64" height="64"></canvas>
+            <div class="reaper-label">Entity: Shoggoth-Pixel // Active</div>
+        </div>
+
+        <!-- Chat Panel -->
+        <div class="chat-panel">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai">Saludos, terrícola. El sistema orbital está listo. Escribe un mensaje para activar mi núcleo.</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="userInput" placeholder="Escribe un comando o mensaje..." autocomplete="off">
+                <button id="sendBtn">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('reaperCanvas');
+        const ctx = canvas.getContext('2d');
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // Animation state variables
+        let frameCount = 0;
+        let isAnimating = false;
+        let animationTimer = 0;
+
+        // Pixel art matrix for a hooded reaper (16x16 grid scaled up)
+        // 0 = transparent, 1 = dark robe, 2 = glowing eyes, 3 = scythe/metal
+        const reaperSprite = [
+            [0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
+            [0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
+            [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+            [0,1,1,1,1,2,2,1,1,2,2,1,1,1,1,0], // Glowing eyes (2)
+            [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,1,0,0,1,1,1,1,1,1,1,1,0,0,1,1],
+            [1,1,0,0,1,1,1,1,1,1,1,1,0,0,1,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+            [0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
+            [0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0],
+            [0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0],
+            [0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0],
+            [0,1,1,1,0,0,0,0,0,0,0,1,1,1,0,0],
+            [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3]  // Scythe blade base
+        ];
+
+        function drawReaper(offsetY = 0, eyeGlow = false) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const pixelSize = 3;
+            const startX = (canvas.width - (16 * pixelSize)) / 2;
+            const startY = ((canvas.height - (16 * pixelSize)) / 2) + offsetY;
+
+            for (let y = 0; y < reaperSprite.length; y++) {
+                for (let x = 0; x < reaperSprite[y].length; x++) {
+                    const pixel = reaperSprite[y][x];
+                    if (pixel !== 0) {
+                        if (pixel === 1) ctx.fillStyle = '#e1e4ed'; // Robe color
+                        else if (pixel === 2) {
+                            ctx.fillStyle = eyeGlow ? '#00ff66' : '#ffffff'; // Glowing eyes reactive state
+                        }
+                        else if (pixel === 3) ctx.fillStyle = '#566075'; // Scythe handle/metal
+
+                        ctx.fillRect(
+                            startX + (x * pixelSize), 
+                            startY + (y * pixelSize), 
+                            pixelSize, 
+                            pixelSize
+                        );
+                    }
+                }
+            }
+        }
+
+        // Render loop for idle floating animation
+        function loop() {
+            frameCount++;
+            // Floating sine wave effect
+            let offsetY = Math.sin(frameCount * 0.05) * 4;
+            
+            if (isAnimating) {
+                offsetY += (Math.random() - 0.5) * 6; // Quick jitter when active
+            }
+
+            drawReaper(offsetY, isAnimating);
+            requestAnimationFrame(loop);
+        }
+
+        // Handle interaction and simulated AI response
+        function handleUserMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            // Append User Message
+            appendMessage(text, 'user');
+            userInput.value = '';
+            
+            // Trigger Reaper Activity Animation
+            isAnimating = true;
+            setTimeout(() => { isAnimating = false; }, 1500);
+
+            // Simulate AI Processing & Response
+            setTimeout(() => {
+                const responses = [
+                    "Órbita estable. Analizando tus palabras a través del vacío cósmico.",
+                    "Datos recibidos en el servidor central. La entropía disminuye levemente.",
+                    "Interesante perspectiva mortal. El escudo térmico resiste.",
+                    "Procesando telemetría... Todo sigue su curso inevitable."
+                ];
+                const randomReply = responses[Math.floor(Math.random() * responses.length)];
+                appendMessage(randomReply, 'ai');
+            }, 800);
+        }
+
+        function appendMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+            msgDiv.textContent = text;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        sendBtn.addEventListener('click', handleUserMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleUserMessage();
+        });
+
+        // Start loop
+        loop();
+    </script>
+</body>
+</html>
