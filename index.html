@@ -73,6 +73,7 @@
             display: flex;
             flex: 1;
             height: calc(100vh - 53px);
+            overflow: hidden;
         }
 
         /* Visual Panel: Pixel Art Reaper */
@@ -109,6 +110,7 @@
             display: flex;
             flex-direction: column;
             background-color: var(--panel-bg);
+            overflow: hidden;
         }
 
         .chat-messages {
@@ -150,6 +152,7 @@
             display: flex;
             gap: 10px;
             background: var(--panel-bg);
+            flex-shrink: 0;
         }
 
         input {
@@ -192,26 +195,39 @@
             }
 
             .visual-panel {
-                flex: 0 0 auto;
-                padding: 10px;
+                flex: 0 0 130px; /* Altura fija arriba para el personaje y su etiqueta */
+                padding: 8px;
                 border-right: none;
                 border-bottom: 1px solid var(--border-color);
+                z-index: 10;
             }
 
             .visual-panel canvas {
-                width: 80px;
-                height: 80px;
+                width: 65px;
+                height: 65px;
             }
 
             .reaper-label {
-                margin-top: 5px;
-                font-size: 0.6rem;
+                margin-top: 4px;
+                font-size: 0.55rem;
                 letter-spacing: 2px;
             }
 
             .chat-panel {
                 width: 100%;
                 flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .chat-messages {
+                flex: 1;
+                overflow-y: auto; /* Solo esta caja hace scroll */
+            }
+
+            .chat-input-area {
+                flex-shrink: 0; /* Mantiene la caja de texto fija abajo */
             }
 
             input {
