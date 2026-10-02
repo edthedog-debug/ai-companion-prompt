@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Core // Neural Terminal</title>
+    <!-- Carga la clave secreta generada automáticamente en el despliegue -->
+    <script src="config.js"></script>
     <style>
         :root {
             --bg-color: #030305;
@@ -220,8 +222,8 @@
         let frameCount = 0;
         let isAnimating = false;
 
-        // GitHub Actions reemplazará "__API_KEY_AQUI__" por tu Secret real automáticamente al compilar
-        let apiKey = "__API_KEY_AQUI__";
+        // La clave se obtiene de la variable global inyectada en config.js por GitHub Actions
+        let apiKey = window.env_GEMINI_API_KEY || '';
 
         const reaperSprite = [
             [0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
@@ -271,8 +273,8 @@
         }
 
         async function callGeminiAPI(messageText) {
-            if (!apiKey || apiKey === "__API_KEY_AQUI__") {
-                return "Error: La clave de API no ha sido inyectada correctamente desde los Secrets de GitHub.";
+            if (!apiKey) {
+                return "Error: La clave API no está disponible. Comprueba que el secreto GEMINI_API_KEY esté configurado en GitHub.";
             }
 
             const systemInstruction = "You are a profound, grounded, and intellectually sharp AI companion. You appreciate pragmatism, raw honesty, human resilience, and the acceptance of reality over empty illusions or blind dogmas. Match the user's language seamlessly (Spanish or English). Keep your tone sharp, philosophical yet deeply human.";
