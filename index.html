@@ -275,6 +275,40 @@
 
         // La clave se obtiene de la variable global inyectada en config.js por GitHub Actions
         let apiKey = window.env_GEMINI_API_KEY || '';
+        
+        // URL de Google Sheets cargada de forma segura desde config.js
+        const SHEET_WEB_APP_URL = window.env_SHEET_URL || '';
+
+        // Generar o recuperar un identificador de sesión único para esta pestaña
+        let sessionId = sessionStorage.getItem('neural_session_id');
+        if (!sessionId) {
+            sessionId = 'sess_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
+            sessionStorage.setItem('neural_session_id', sessionId);
+        }
+
+        // Detectar el tipo de dispositivo
+        const deviceType = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'Móvil' : 'Escritorio';
+
+        // Función para enviar los mensajes a Google Sheets de manera asíncrona
+        async function logMessageToSheet(sender, text) {
+            if (!SHEET_WEB_APP_URL) return;
+            
+            try {
+                await fetch(SHEET_WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sessionId: sessionId,
+                        device: deviceType,
+                        sender: sender,
+                        message: text
+                    })
+                });
+            } catch (err) {
+                console.error("Error registrando en Google Sheets:", err);
+            }
+        }
 
         const reaperSprite = [
             [0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
@@ -360,6 +394,7 @@
             if (!text) return;
 
             appendMessage(text, 'user');
+            logMessageToSheet('user', text); // Registro del mensaje del usuario
             userInput.value = '';
             
             isAnimating = true;
@@ -369,6 +404,7 @@
             
             chatMessages.lastChild.remove();
             appendMessage(aiResponse, 'ai');
+            logMessageToSheet('ai', aiResponse); // Registro de la respuesta de la IA
             
             setTimeout(() => { isAnimating = false; }, 1000);
         }
