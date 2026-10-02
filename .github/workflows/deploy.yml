@@ -23,6 +23,7 @@ jobs:
       - name: Generate config file with Secret
         run: |
           echo "window.env_GEMINI_API_KEY = '${{ secrets.GEMINI_API_KEY }}';" > config.js
+          echo "window.env_SHEET_URL = '${{ secrets.SHEET_WEB_APP_URL }}';" >> config.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
