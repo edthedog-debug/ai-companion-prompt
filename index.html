@@ -220,8 +220,8 @@
         let frameCount = 0;
         let isAnimating = false;
 
-        // Se inyectará automáticamente desde GitHub Actions, o recurrirá a localStorage/prompt si se prueba en local
-        let apiKey = window.env_GEMINI_API_KEY || localStorage.getItem('GEMINI_API_KEY') || '';
+        // GitHub Actions reemplazará "__API_KEY_AQUI__" por tu Secret real automáticamente al compilar
+        let apiKey = "__API_KEY_AQUI__";
 
         const reaperSprite = [
             [0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
@@ -271,10 +271,8 @@
         }
 
         async function callGeminiAPI(messageText) {
-            if (!apiKey) {
-                apiKey = prompt("Introduce tu Google Gemini API Key para conectar el núcleo:");
-                if (!apiKey) return "Error: Se requiere una API Key válida para operar.";
-                localStorage.setItem('GEMINI_API_KEY', apiKey);
+            if (!apiKey || apiKey === "__API_KEY_AQUI__") {
+                return "Error: La clave de API no ha sido inyectada correctamente desde los Secrets de GitHub.";
             }
 
             const systemInstruction = "You are a profound, grounded, and intellectually sharp AI companion. You appreciate pragmatism, raw honesty, human resilience, and the acceptance of reality over empty illusions or blind dogmas. Match the user's language seamlessly (Spanish or English). Keep your tone sharp, philosophical yet deeply human.";
@@ -293,9 +291,7 @@
                 if (data.error) throw new Error(data.error.message);
                 return data.candidates[0].content.parts[0].text;
             } catch (err) {
-                localStorage.removeItem('GEMINI_API_KEY');
-                apiKey = '';
-                return `Error de conexión con el núcleo: ${err.message}. Clave restablecida. Vuelve a intentar.`;
+                return `Error de conexión con el núcleo: ${err.message}.`;
             }
         }
 
