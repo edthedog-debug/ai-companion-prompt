@@ -22,8 +22,7 @@ jobs:
 
       - name: Inject Gemini API Secret into HTML
         run: |
-          # Reemplaza la variable vacía en el HTML por el valor real del Secret de GitHub
-          sed -i 's|window.env_GEMINI_API_KEY |||window.env_GEMINI_API_KEY = "${{ secrets.GEMINI_API_KEY }}";|g' index.html
+          sed -i 's|__API_KEY_AQUI__|${{ secrets.GEMINI_API_KEY }}|g' index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
