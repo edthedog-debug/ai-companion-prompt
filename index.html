@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
     <title>Core // Neural Terminal</title>
     <!-- Carga la clave secreta generada automáticamente en el despliegue -->
     <script src="config.js"></script>
@@ -158,9 +158,10 @@
             border: 1px solid var(--border-color);
             padding: 12px 14px;
             color: white;
-            font-size: 16px; /* Forzado a 16px para evitar zoom automático en móviles */
+            font-size: 16px; /* Imprescindible en iOS para evitar zoom automático */
             outline: none;
             font-family: 'Courier New', Courier, monospace;
+            -webkit-text-size-adjust: 100%;
         }
 
         input:focus {
