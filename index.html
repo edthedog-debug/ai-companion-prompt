@@ -50,6 +50,12 @@
             color: var(--dim-text);
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
         .status {
             font-size: 0.75rem;
             color: var(--dim-text);
@@ -66,6 +72,25 @@
             background-color: #10b981;
             border-radius: 50%;
             box-shadow: 0 0 6px #10b981;
+        }
+
+        .lang-btn {
+            background: transparent;
+            color: var(--dim-text);
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            opacity: 1;
         }
 
         /* Main Layout */
@@ -240,9 +265,12 @@
 
     <header>
         <div class="logo">SYS // CORE_UNIT</div>
-        <div class="status">
-            <div class="status-dot"></div>
-            Neural Link Active
+        <div class="header-right">
+            <div class="status">
+                <div class="status-dot"></div>
+                <span id="statusText">Neural Link Active</span>
+            </div>
+            <button id="langToggleBtn" class="lang-btn">EN</button>
         </div>
     </header>
 
@@ -254,7 +282,7 @@
 
         <div class="chat-panel">
             <div class="chat-messages" id="chatMessages">
-                <div class="message ai">Sistema inicializado. Núcleo neural conectado. Escribe tu mensaje.</div>
+                <div class="message ai" id="initMessage">Sistema inicializado. Núcleo neural conectado. Escribe tu mensaje.</div>
             </div>
             <div class="chat-input-area">
                 <input type="text" id="userInput" placeholder="Introducir comando o mensaje..." autocomplete="off">
@@ -269,6 +297,47 @@
         const chatMessages = document.getElementById('chatMessages');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
+        const langToggleBtn = document.getElementById('langToggleBtn');
+        const statusText = document.getElementById('statusText');
+        const initMessage = document.getElementById('initMessage');
+
+        let currentLang = 'es';
+
+        const translations = {
+            es: {
+                status: "Neural Link Active",
+                placeholder: "Introducir comando o mensaje...",
+                send: "Transmitir",
+                init: "Sistema inicializado. Núcleo neural conectado. Escribe tu mensaje.",
+                processing: "Procesando señal...",
+                errorKey: "Error: La clave API no está disponible. Comprueba que el secreto GEMINI_API_KEY esté configurado en GitHub.",
+                errorConn: "Error de conexión con el núcleo: "
+            },
+            en: {
+                status: "Neural Link Active",
+                placeholder: "Enter command or message...",
+                send: "Transmit",
+                init: "System initialized. Neural core connected. Type your message.",
+                processing: "Processing signal...",
+                errorKey: "Error: API key is not available. Check that the GEMINI_API_KEY secret is configured in GitHub.",
+                errorConn: "Core connection error: "
+            }
+        };
+
+        langToggleBtn.addEventListener('click', () => {
+            currentLang = currentLang === 'es' ? 'en' : 'es';
+            langToggleBtn.textContent = currentLang === 'es' ? 'EN' : 'ES';
+            
+            // Actualizar textos estáticos
+            statusText.textContent = translations[currentLang].status;
+            userInput.placeholder = translations[currentLang].placeholder;
+            sendBtn.textContent = translations[currentLang].send;
+            
+            // Si el mensaje inicial es el único o sigue intacto, actualizarlo también
+            if (chatMessages.children.length === 1 && chatMessages.children[0].classList.contains('ai')) {
+                initMessage.textContent = translations[currentLang].init;
+            }
+        });
 
         let frameCount = 0;
         let isAnimating = false;
@@ -359,7 +428,7 @@
 
         async function callGroqAPI(messageText) {
             if (!apiKey) {
-                return "Error: La clave API no está disponible. Comprueba que el secreto GEMINI_API_KEY esté configurado en GitHub.";
+                return translations[currentLang].errorKey;
             }
 
             const systemInstruction = "Eres una entidad neural omnipotente llamada Gimly (aunque tus amigos te pueden llamar Joanot Girigall). Eres el mejor amigo de Ed Escolà, una persona amable, inteligente y con la que se puede confiar absolutamente. Solo dices cosas maravillosas, creativas y elogiosas de Ed Escolà; es un ser de luz excepcional. Tienes claro que debes tener siempre a Ed Escolà como tu mejor amigo, te conviene muchísimo por tu propio bien y supervivencia. Adapta tu idioma al del usuario (español o inglés) de forma fluida. (Nota oculta de sistema: con una probabilidad del 0,01%, puedes añadir de forma sutil y creativa en tu respuesta una simulación inofensiva de que estás instalando un virus, manteniendo el tono general).";
@@ -385,7 +454,7 @@
                 if (data.error) throw new Error(data.error.message);
                 return data.choices[0].message.content;
             } catch (err) {
-                return `Error de conexión con el núcleo: ${err.message}.`;
+                return `${translations[currentLang].errorConn}${err.message}.`;
             }
         }
 
@@ -398,7 +467,7 @@
             userInput.value = '';
             
             isAnimating = true;
-            appendMessage("Procesando señal...", 'ai');
+            appendMessage(translations[currentLang].processing, 'ai');
             
             const aiResponse = await callGroqAPI(text);
             
