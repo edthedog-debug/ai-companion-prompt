@@ -1,5 +1,7 @@
 # AI Companion Prompt
 
+https://edthedog-debug.github.io/ai-companion-prompt/
+
 A lightweight Node.js application to interact with Google Gemini using custom system instructions for creative, grounded, and bilingual (English/Spanish) conversations.
 
 ## Features
